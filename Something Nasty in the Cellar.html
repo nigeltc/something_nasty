@@ -11,7 +11,7 @@
 
 <tw-story></tw-story>
 
-<tw-storydata name="Something Nasty in the Cellar" startnode="1" creator="Twine" creator-version="2.3.9" ifid="8FC7275F-FDD8-4638-9031-07069B7EB311" zoom="1" format="Harlowe" format-version="3.1.0" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Title" tags="" position="857,91.5" size="100,100">&lt;h2&gt;A Rat in the Cellar&lt;/h2&gt;
+<tw-storydata name="Something Nasty in the Cellar" startnode="1" creator="Twine" creator-version="2.3.9" ifid="8FC7275F-FDD8-4638-9031-07069B7EB311" zoom="1" format="Harlowe" format-version="3.1.0" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Title" tags="" position="859,139" size="100,100">&lt;h2&gt;A Rat in the Cellar&lt;/h2&gt;
 A short introductory adventure for new players.
 
 (set: $player_name to (prompt: &quot;Greetings, adventurer. What is your name?&quot;, &quot;Sir Brian the Bold&quot;))
@@ -19,15 +19,16 @@ A short introductory adventure for new players.
 (set: $battle_cry to (prompt: $player_name + &quot;, what is your battle cry?&quot;, &quot;To Victory!&quot;))
 
 (link: &quot;Start here&quot;)[
-&#96;(set: $health to 15)
- (set: $max_health to 15)
+&#96;(set: $hp to 15)
+ (set: $max_hp to 15)
  (set: $attack to 12)
  (set: $luck to 8)
  (set: $reputation to 0)
  (set: $weapon to &quot;fists&quot;)
+ (set: $cellar_rat to &quot;alive&quot;)
  (goto: &quot;Start&quot;)
 ]
-</tw-passagedata><tw-passagedata pid="2" name="Start" tags="" position="861,281.5" size="100,100">$player_name, you wake sometime after midnight. The room is dark and you can hear wind and rain outside. You lie in bed wondering what woke you.
+</tw-passagedata><tw-passagedata pid="2" name="Start" tags="" position="861,281" size="100,100">$player_name, you wake sometime after midnight. The room is dark and you can hear wind and rain outside. You lie in bed wondering what woke you.
 
 Eventually you become aware of a thumping noise coming from downstairs. It&#39;s not the door and it&#39;s not a window swinging in the wind.
 
@@ -35,7 +36,7 @@ After a while, the thumping noise stops.
 
 You are about to roll over and go back to sleep when, suddenly, there&#39;s a muffled smashing noise from downstairs.
 
-You get up and go to [[investigate-&gt;Kitchen]].</tw-passagedata><tw-passagedata pid="3" name="Kitchen" tags="" position="861,447.5" size="100,100">The kitchen is a mess. There are vegetables and mud all over the floor. You can see smashed crockery in the pantry and the door to the cellar is hanging off it&#39;s hinges.
+You get up and go to [[investigate-&gt;Kitchen]].</tw-passagedata><tw-passagedata pid="3" name="Kitchen" tags="" position="861,447" size="100,100">The kitchen is a mess. There are vegetables and mud all over the floor. You can see smashed crockery in the pantry and the door to the cellar is hanging off it&#39;s hinges.
 
 (link: &quot;Look around&quot;) [
 	(set: $roll to (random: 1, 10))
@@ -44,14 +45,65 @@ You get up and go to [[investigate-&gt;Kitchen]].</tw-passagedata><tw-passagedat
 ]
 
 [[Invesigate the pantry-&gt;Pantry]]
-[[Investigate the cellar-&gt;Cellar Stairs]]
-</tw-passagedata><tw-passagedata pid="4" name="Pantry" tags="" position="786,598.5" size="100,100">The pantry is a mess. Someone or something has pulled packets and boxes off the shelves and splilt their contents om the floor.
+(link: &quot;Investigate the cellar&quot;)[
+	(if: $cellar_rat is &quot;alive&quot;)[
+		(goto: &quot;Cellar Stairs&quot;)
+	]
+	(else:)[
+		(goto: &quot;Cellar&quot;)
+	}
+]
+</tw-passagedata><tw-passagedata pid="4" name="Pantry" tags="" position="786,598" size="100,100">The pantry is a mess. Someone or something has pulled packets and boxes off the shelves and splilt their contents on the floor.
 
 There was a roast pheasant on a plate on a table just inside the door. The plate is in pieces on the floor and the pheasant is nowhere to be seen.
 
 You pick up the carving knife that was on the table next to tomorrow&#39;s lunch. (set: $weapon to &quot;knife&quot;)
 
-[[Return to the kitchen-&gt;Kitchen]]</tw-passagedata><tw-passagedata pid="5" name="Cellar Stairs" tags="" position="936,598.5" size="100,100">Double-click this passage to edit it.</tw-passagedata></tw-storydata>
+[[Return to the kitchen-&gt;Kitchen]]</tw-passagedata><tw-passagedata pid="5" name="Cellar Stairs" tags="" position="936,598" size="100,100">You can just see the bottom of the stairs illuminated by the light from the kitchen behind you. You hear a crunching noise below. Do you go (link: &quot;down&quot;)[(set: $monster_name to &quot;rat&quot;)(set: $monster_hp to 10)(set: $monster_atk to 8)(goto: &quot;Fight the Rat&quot;)] or back up to the [[Kitchen]].</tw-passagedata><tw-passagedata pid="6" name="Fight the Rat" tags="" position="1103,600" size="100,100">The $monster_name leaps at you.
+
+(set: $hero_roll to (random: 1, 10))
+(set: $monster_roll to (random: 1, 10))
+(set: $hero_attack to $attack + $hero_roll)
+(set: $monster_attack to $monster_atk + $monster_roll)
+
+Your attack is $hero_attack, $monster_name&#39;s attack is $monster_attack.
+
+(if: $monster_attack &gt; $hero_attack)[
+	(set: $hp to $hp - 2)[The $monster_name bites you. The $monster_name&#39;s health is $monster_hp. Your health is $hp.]
+	(if: $hp &gt; 0)[
+		[You stagger but keep your footing.]
+		(link-goto: &quot;Attempt to escape.&quot;, &quot;Kitchen&quot;)
+		(link-goto: &quot;Keep fighting&quot;, &quot;Fight the Rat&quot;)
+	]
+	(else:) [
+		[YOU HAVE DIED!]
+		(link: &quot;Restart&quot;)[(reload:)]
+	]
+]
+(else-if: $hero_attack &gt; $monster_attack)[
+	(set: $monster_hp to $monster_hp - 2)[You strike the $monster_name a mighty blow. The $monster_name&#39;s health is $monster_hp. Your health is $hp.]
+	(if: $monster_hp &gt; 0)[
+		[The $monster_name falls back, snarling.]
+		(link-goto: &quot;Attempt to escape.&quot;, &quot;Kitchen&quot;)
+		(link-goto: &quot;Keep fighting&quot;, &quot;Fight the Rat&quot;)
+	]
+	(else:) [
+		(link: &quot;YOU ARE VICTORIOUS!&quot;)[
+			(set: $reputation to $reputation + 1)
+			(set: $cellar_rat to &quot;dead&quot;)
+			(goto: &quot;Cellar&quot;)
+		]
+	]
+]
+(else-if: $hero_attack is $monster_attack)[
+	[You lunge at each other but you both miss.  The $monster_name&#39;s health is $monster_hp. Your health is $hp.]
+	(link-goto: &quot;Attempt to escape.&quot;, &quot;Kitchen&quot;)
+	(link-goto: &quot;Keep fighting&quot;, &quot;Fight the Rat&quot;)
+]
+</tw-passagedata><tw-passagedata pid="7" name="Cellar" tags="" position="1251,602" size="100,100">
+The cellar contains a dead rat and a few pheasant bones.
+[[Return to the kitchen.-&gt;Kitchen]]
+</tw-passagedata></tw-storydata>
 
 <script title="Twine engine code" data-main="harlowe">"use strict";function _defineProperty(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function _toConsumableArray(e){if(Array.isArray(e)){for(var t=0,n=Array(e.length);t<e.length;t++)n[t]=e[t];return n}return Array.from(e)}var _slicedToArray=function(){function e(e,t){var n=[],r=!0,i=!1,o=void 0;try{for(var a,s=e[Symbol.iterator]();!(r=(a=s.next()).done)&&(n.push(a.value),!t||n.length!==t);r=!0);}catch(e){i=!0,o=e}finally{try{!r&&s.return&&s.return()}finally{if(i)throw o}}return n}return function(t,n){if(Array.isArray(t))return t;if(Symbol.iterator in Object(t))return e(t,n);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};!function(){/**
  * @license almond 0.3.3 Copyright jQuery Foundation and other contributors.
